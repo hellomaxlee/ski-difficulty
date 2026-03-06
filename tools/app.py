@@ -1,20 +1,30 @@
 """
 FastAPI app for the Sugarbush Trail Analyzer.
-Run with: uv run uvicorn tools.app:app --reload
+Run with: uv run python tools/run.py
 """
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-import json
 
-from tools.sugarbush_trail_analyzer import analyze_trails
+from tools.fetch_trails import fetch_trails
+from tools.fetch_elevations import add_elevations_to_trails
+from tools.score_trails import score_trails
 
 app = FastAPI(title="Sugarbush Trail Analyzer")
 
-# Cache results so we don't re-fetch on every request
+# Cache results in memory — cleared on server restart
 _cached_trails = None
+
+
+def analyze_trails():
+    print("Fetching trails from OpenStreetMap...")
+    trails = fetch_trails()
+    print(f"Found {len(trails)} named, classified trails.")
+    print("Fetching elevation data...")
+    trails_with_elevations = add_elevations_to_trails(trails)
+    print("Scoring trails...")
+    return score_trails(trails_with_elevations)
 
 
 @app.get("/api/trails")

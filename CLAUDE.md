@@ -28,3 +28,8 @@ Data science project with a Python + FastAPI backend.
 - Ask before proceeding only when a key assumption could significantly affect direction
 - Commit and push on my behalf when work is complete
 - Never add unnecessary boilerplate, over-engineer, or add features not requested
+
+## Workflows to reduce errors
+- For each tool, make a markdown format strategy plan in the "workflows" folder; it should be a comprehensive summary of what tool you want to build
+- Then, make a tool that is the same name as the workflow in the "workflows" folder but locate this implementation in the "tools" folder; this will be the manifestation of the workflow
+- The "additional" folder will house skills, or connections to third party apps to gain context in order to better the project
