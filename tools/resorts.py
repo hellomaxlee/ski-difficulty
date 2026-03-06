@@ -233,18 +233,6 @@ RESORTS = {
             "border": "#202836", "text": "#c4ccd8", "muted": "#506070", "accent": "#5080b0",
         },
     },
-    "roundtop": {
-        "name": "Roundtop Mountain Resort",
-        "location": "Lewisberry, PA",
-        "bbox": (40.14, -76.98, 40.21, -76.89),
-        "zones": [
-            {"name": "Roundtop Mountain", "lat_threshold": math.inf},
-        ],
-        "theme": {
-            "bg": "#0c0f0a", "surface": "#131710", "surface2": "#181e14",
-            "border": "#242c1e", "text": "#ccd4c4", "muted": "#607060", "accent": "#8aaa60",
-        },
-    },
 }
 
 
