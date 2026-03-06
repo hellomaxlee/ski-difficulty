@@ -13,8 +13,9 @@ DIFFICULTY_ORDER = ["Green", "Blue", "Black", "Double Black"]
 # Weights derived from NSAA official trail rating guidelines:
 # - Max slope (50%): primary criterion — NSAA rates trails by their steepest section
 # - Avg slope (35%): secondary — sustained difficulty across the full run
-# - Vertical drop (15%): not a direct NSAA factor; proxy for fatigue/stamina only
-WEIGHTS = {"vertical_drop": 0.15, "avg_slope": 0.35, "max_slope": 0.50}
+# - Elevation (10%): higher-altitude trails are more exposed and often icier
+# - Vertical drop (5%): fatigue proxy; depends heavily on conditions, kept minimal
+WEIGHTS = {"vertical_drop": 0.05, "avg_slope": 0.35, "max_slope": 0.50, "elevation": 0.10}
 
 
 def compute_metrics(points, elevations):
@@ -27,6 +28,7 @@ def compute_metrics(points, elevations):
         return None
 
     vertical_drop_ft = (max(valid) - min(valid)) * 3.28084
+    avg_elevation_ft = (sum(valid) / len(valid)) * 3.28084
 
     slopes = []
     for i in range(1, len(points)):
@@ -42,6 +44,7 @@ def compute_metrics(points, elevations):
 
     return {
         "vertical_drop_ft": round(vertical_drop_ft, 1),
+        "avg_elevation_ft": round(avg_elevation_ft, 1),
         "avg_slope_deg": round(float(np.mean(slopes)), 2) if slopes else 0.0,
         "max_slope_deg": round(float(np.max(slopes)), 2) if slopes else 0.0,
     }
@@ -63,12 +66,19 @@ def score_trails(trails_with_elevations):
         metrics = compute_metrics(trail["points"], trail["elevations"])
         if not metrics:
             continue
-        computed.append({"name": trail["name"], "official": trail["official"], **metrics})
+        computed.append({
+            "name": trail["name"],
+            "official": trail["official"],
+            "mountain": trail.get("mountain", ""),
+            "grooming": trail.get("grooming", ""),
+            **metrics,
+        })
 
     if not computed:
         return []
 
     vd = np.array([r["vertical_drop_ft"] for r in computed])
+    el = np.array([r["avg_elevation_ft"] for r in computed])
     ag = np.array([r["avg_slope_deg"] for r in computed])
     ms = np.array([r["max_slope_deg"] for r in computed])
 
@@ -76,21 +86,23 @@ def score_trails(trails_with_elevations):
         rng = arr.max() - arr.min()
         return (arr - arr.min()) / rng if rng > 0 else np.zeros_like(arr)
 
-    vd_n, ag_n, ms_n = norm(vd), norm(ag), norm(ms)
+    vd_n, el_n, ag_n, ms_n = norm(vd), norm(el), norm(ag), norm(ms)
 
     # Default composite score using NSAA-derived weights (for initial sort)
     default_composite = (
         WEIGHTS["vertical_drop"] * vd_n
-        + WEIGHTS["avg_slope"] * ag_n
-        + WEIGHTS["max_slope"] * ms_n
+        + WEIGHTS["elevation"]    * el_n
+        + WEIGHTS["avg_slope"]    * ag_n
+        + WEIGHTS["max_slope"]    * ms_n
     )
 
     for i, result in enumerate(computed):
         # Include normalized values so the client can recompute with custom weights
         result["norm_vertical_drop"] = round(float(vd_n[i]), 4)
-        result["norm_avg_slope"] = round(float(ag_n[i]), 4)
-        result["norm_max_slope"] = round(float(ms_n[i]), 4)
-        result["default_score"] = round(float(default_composite[i]), 4)
+        result["norm_avg_elevation"] = round(float(el_n[i]), 4)
+        result["norm_avg_slope"]     = round(float(ag_n[i]), 4)
+        result["norm_max_slope"]     = round(float(ms_n[i]), 4)
+        result["default_score"]      = round(float(default_composite[i]), 4)
 
     computed.sort(key=lambda r: r["default_score"], reverse=True)
     return computed

@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sugarbush Trail Analyzer</title>
+  <title>Trail Analyzer</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #0b120e;
-      --surface:    #111a14;
-      --surface2:   #162019;
-      --border:     #243028;
-      --text:       #cdd9c8;
-      --muted:      #5e7a62;
-      --gold:       #c4a05a;
+      --bg:       #0b120e;
+      --surface:  #111a14;
+      --surface2: #162019;
+      --border:   #243028;
+      --text:     #cdd9c8;
+      --muted:    #5e7a62;
+      --accent:   #c4a05a;
+
       --green:      #4a8c50;
       --green-bg:   #0f2212;
       --blue:       #3d7ab5;
@@ -33,17 +34,21 @@
       background-image:
         radial-gradient(ellipse 120% 40% at 50% 100%, #0d2015 0%, transparent 70%),
         radial-gradient(ellipse 80%  60% at 20% 110%, #071510 0%, transparent 60%),
-        radial-gradient(ellipse 80%  60% at 80% 110%, #071510 0%, transparent 60%),
-        radial-gradient(ellipse 200% 30% at 50%  85%, #0a1a0f 0%, transparent 100%);
+        radial-gradient(ellipse 80%  60% at 80% 110%, #071510 0%, transparent 60%);
       color: var(--text);
       min-height: 100vh;
       padding: 2rem 2.5rem 4rem;
+      transition: background-color 0.4s, color 0.4s;
     }
 
     header {
       margin-bottom: 2rem;
       border-bottom: 1px solid var(--border);
       padding-bottom: 1.25rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.25rem;
+      flex-wrap: wrap;
     }
 
     header h1 {
@@ -51,15 +56,26 @@
       font-weight: 600;
       letter-spacing: 0.5px;
       color: #e8f0e4;
+      white-space: nowrap;
     }
 
-    header h1 span { color: var(--gold); }
+    header h1 span { color: var(--accent); transition: color 0.4s; }
 
-    header p {
-      color: var(--muted);
-      margin-top: 0.35rem;
-      font-size: 0.875rem;
+    #resort-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.7rem;
+      border-radius: 7px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
     }
+
+    #resort-select:focus { border-color: var(--accent); }
+
+    .resort-location { font-size: 0.8rem; color: var(--muted); }
 
     .layout {
       display: grid;
@@ -75,6 +91,7 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1.1rem 1.25rem;
+      transition: background 0.4s, border-color 0.4s;
     }
 
     .card-title {
@@ -82,21 +99,19 @@
       font-weight: 700;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--accent);
       margin-bottom: 1rem;
+      transition: color 0.4s;
     }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.6rem;
-    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
 
     .stat {
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 7px;
       padding: 0.6rem 0.75rem;
+      transition: background 0.4s, border-color 0.4s;
     }
 
     .stat-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 2px; }
@@ -104,150 +119,93 @@
     .stat-value.over  { color: var(--over); }
     .stat-value.under { color: var(--under); }
 
-    .weight-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      margin-bottom: 0.85rem;
-    }
-
+    .weight-row { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; }
     .weight-row:last-of-type { margin-bottom: 0; }
 
-    .weight-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
+    .weight-header { display: flex; justify-content: space-between; align-items: baseline; }
     .weight-name { font-size: 0.82rem; color: var(--text); font-weight: 500; }
-
-    .weight-pct {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--gold);
-      width: 2.8rem;
-      text-align: right;
-    }
+    .weight-pct  { font-size: 0.82rem; font-weight: 700; color: var(--accent); width: 2.8rem; text-align: right; transition: color 0.4s; }
 
     input[type="range"] {
-      width: 100%;
-      -webkit-appearance: none;
-      height: 4px;
-      border-radius: 2px;
-      background: var(--border);
-      outline: none;
-      cursor: pointer;
+      width: 100%; -webkit-appearance: none;
+      height: 4px; border-radius: 2px;
+      background: var(--border); outline: none; cursor: pointer;
     }
 
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--gold);
-      cursor: pointer;
-      border: 2px solid var(--bg);
-      transition: background 0.15s;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent); cursor: pointer;
+      border: 2px solid var(--bg); transition: background 0.15s;
     }
-
-    input[type="range"]::-webkit-slider-thumb:hover { background: #e0bb7a; }
 
     .weight-sum {
-      text-align: right;
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 0.6rem;
-      padding-top: 0.6rem;
-      border-top: 1px solid var(--border);
+      text-align: right; font-size: 0.75rem; color: var(--muted);
+      margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid var(--border);
     }
 
-    .weight-sum span { color: var(--gold); font-weight: 700; }
+    .weight-sum span { color: var(--accent); font-weight: 700; }
 
     .justification {
-      font-size: 0.75rem;
-      color: var(--muted);
-      line-height: 1.55;
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--border);
+      font-size: 0.75rem; color: var(--muted); line-height: 1.55;
+      margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);
     }
 
-    .justification strong { color: var(--text); }
-
-    .classif-note {
-      font-size: 0.75rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
+    .classif-note { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
     .classif-note strong { color: var(--text); }
 
     .filter-row { display: flex; flex-direction: column; gap: 0.5rem; }
 
     .filter-row label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      font-size: 0.75rem; color: var(--muted);
+      display: flex; flex-direction: column; gap: 4px;
     }
 
     .filter-row select,
-    .filter-row input {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.4rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      width: 100%;
+    .filter-row input[type="text"] {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); padding: 0.4rem 0.6rem;
+      border-radius: 6px; font-size: 0.82rem; width: 100%;
     }
+
+    .checkbox-row {
+      display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 0.25rem;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 14px; height: 14px; accent-color: var(--accent);
+      cursor: pointer; flex-shrink: 0; margin-top: 2px;
+    }
+
+    .checkbox-row span { font-size: 0.78rem; color: var(--text); cursor: pointer; line-height: 1.3; }
+    .checkbox-row span small { display: block; font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
 
     .main { min-width: 0; }
 
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-    }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
 
     table { width: 100%; border-collapse: collapse; font-size: 0.855rem; }
 
     th {
-      background: var(--surface);
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 0.72rem;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      text-align: left;
-      padding: 0.7rem 1rem;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
+      background: var(--surface); color: var(--muted);
+      font-weight: 600; font-size: 0.72rem; letter-spacing: 0.5px;
+      text-transform: uppercase; text-align: left;
+      padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none; white-space: nowrap;
     }
 
     th:hover { color: var(--text); }
-    th.sorted { color: var(--gold); }
+    th.sorted { color: var(--accent); }
     th .arrow { margin-left: 3px; opacity: 0.5; }
     th.sorted .arrow { opacity: 1; }
 
-    td {
-      padding: 0.6rem 1rem;
-      border-bottom: 1px solid #151e18;
-      white-space: nowrap;
-    }
-
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid #151e18; white-space: nowrap; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: var(--surface2); }
 
     .badge {
-      display: inline-block;
-      padding: 2px 9px;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      display: inline-block; padding: 2px 9px;
+      border-radius: 10px; font-size: 0.75rem; font-weight: 600;
     }
 
     .badge-Green       { background: var(--green-bg); color: var(--green); border: 1px solid #1e4a24; }
@@ -255,74 +213,59 @@
     .badge-Black       { background: var(--black-bg); color: var(--black); border: 1px solid #333; }
     .badge-DoubleBlack { background: var(--dbl-bg);   color: var(--dbl);   border: 1px solid #3a1f58; }
 
+    .badge-ungroomed {
+      display: inline-block; padding: 1px 6px; border-radius: 8px;
+      font-size: 0.68rem; font-weight: 600;
+      background: #1e1508; color: #a07840; border: 1px solid #3a2a10;
+      margin-left: 5px; vertical-align: middle;
+    }
+
+    .mountain-tag { font-size: 0.72rem; color: var(--muted); }
+
     .verdict-Accurate       { color: var(--muted); font-size: 0.8rem; }
     .verdict-Overestimated  { color: var(--over);  font-size: 0.8rem; font-weight: 600; }
     .verdict-Underestimated { color: var(--under); font-size: 0.8rem; font-weight: 600; }
 
     .score-wrap { display: flex; align-items: center; gap: 7px; }
 
-    .score-bar-bg {
-      width: 64px;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
+    .score-bar-bg { width: 64px; height: 4px; background: var(--border); border-radius: 2px; flex-shrink: 0; }
 
     .score-bar-fill {
-      height: 100%;
-      border-radius: 2px;
+      height: 100%; border-radius: 2px;
       background: linear-gradient(90deg, var(--green) 0%, var(--blue) 40%, var(--black) 70%, var(--dbl) 100%);
     }
 
     .score-num { font-size: 0.78rem; color: var(--muted); width: 3rem; text-align: right; }
 
-    #loading {
-      text-align: center;
-      padding: 5rem 2rem;
-      color: var(--muted);
-    }
+    #loading { text-align: center; padding: 5rem 2rem; color: var(--muted); }
 
     .spinner {
-      width: 28px;
-      height: 28px;
-      border: 2px solid var(--border);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin: 0 auto 1rem;
+      width: 28px; height: 28px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin: 0 auto 1rem;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
     #error-box {
-      display: none;
-      background: #1e0f0f;
-      border: 1px solid #5a1a1a;
-      border-radius: 8px;
-      padding: 1rem 1.25rem;
-      color: #e07a7a;
-      margin-bottom: 1rem;
+      display: none; background: #1e0f0f; border: 1px solid #5a1a1a;
+      border-radius: 8px; padding: 1rem 1.25rem; color: #e07a7a; margin-bottom: 1rem;
     }
 
-    .source-note {
-      font-size: 0.7rem;
-      color: var(--muted);
-      margin-top: 1rem;
-      opacity: 0.7;
-    }
+    .source-note { font-size: 0.7rem; color: var(--muted); margin-top: 1rem; opacity: 0.7; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Sugarbush <span>Trail Analyzer</span></h1>
-  <p>Topographic difficulty analysis — Lincoln Peak &amp; Mt. Ellen</p>
+  <h1 id="resort-title">Trail <span>Analyzer</span></h1>
+  <select id="resort-select"></select>
+  <span class="resort-location" id="resort-location"></span>
 </header>
 
 <div id="loading">
   <div class="spinner"></div>
-  <p>Fetching trail and elevation data — first load takes a minute or two...</p>
+  <p id="loading-msg">Loading…</p>
 </div>
 
 <div id="error-box"></div>
@@ -358,34 +301,43 @@
 
         <div class="weight-row">
           <div class="weight-header">
-            <span class="weight-name">Vertical Drop</span>
-            <span class="weight-pct" id="pct-vd">15%</span>
+            <span class="weight-name">Elevation</span>
+            <span class="weight-pct" id="pct-el">10%</span>
           </div>
-          <input type="range" id="w-vd" min="0" max="100" value="15" step="1" />
+          <input type="range" id="w-el" min="0" max="100" value="10" step="1" />
+        </div>
+
+        <div class="weight-row">
+          <div class="weight-header">
+            <span class="weight-name">Vertical Drop</span>
+            <span class="weight-pct" id="pct-vd">5%</span>
+          </div>
+          <input type="range" id="w-vd" min="0" max="100" value="5" step="1" />
         </div>
 
         <div class="weight-sum">Total: <span id="weight-total">100%</span></div>
 
         <div class="justification">
-          <strong>NSAA basis:</strong> Trails are officially rated by their
-          <strong>steepest section</strong> (max slope) — making it the primary
-          signal. Average slope captures sustained difficulty. Vertical drop
-          reflects stamina but is not a direct NSAA classification criterion.
-          <br><br>
-          Defaults: Max 50% · Avg 35% · Drop 15%
+          NSAA rates trails by steepest section (max slope = primary). Avg slope captures sustained difficulty. Elevation proxies exposure and icy conditions. Vertical drop is a minor fatigue proxy.
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title">Classification Method</div>
+        <div class="card-title">Adjustments</div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="ungroomed-boost" />
+          <span>
+            Ungroomed difficulty boost
+            <small>+20% score for mogul, backcountry &amp; freeride runs</small>
+          </span>
+        </label>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Classification</div>
         <div class="classif-note">
-          Computed ratings use <strong>percentile thresholds</strong> matched
-          to the official distribution — so the same proportion of trails
-          receive each computed tier as exists in Sugarbush's official ratings.
-          <br><br>
-          Official data from <strong>OpenStreetMap</strong>, mapped to NSAA
-          standard: novice/easy → Green, intermediate → Blue,
-          advanced → Black, expert → Double Black.
+          Computed tiers use <strong>percentile thresholds</strong> matched to
+          the official distribution. Official data from <strong>OpenStreetMap</strong>.
         </div>
         <div id="dist-breakdown" style="margin-top:0.75rem; font-size:0.75rem; color:var(--muted); line-height:1.8;"></div>
       </div>
@@ -393,6 +345,11 @@
       <div class="card">
         <div class="card-title">Filters</div>
         <div class="filter-row">
+          <label>Mountain / Zone
+            <select id="filter-mountain">
+              <option value="">All</option>
+            </select>
+          </label>
           <label>Official rating
             <select id="filter-official">
               <option value="">All</option>
@@ -411,7 +368,7 @@
             </select>
           </label>
           <label>Search
-            <input id="search" type="text" placeholder="Trail name..." />
+            <input id="search" type="text" placeholder="Trail name…" />
           </label>
         </div>
       </div>
@@ -424,6 +381,7 @@
           <thead>
             <tr>
               <th data-col="name">Trail <span class="arrow">↕</span></th>
+              <th data-col="mountain">Zone <span class="arrow">↕</span></th>
               <th data-col="official">Official <span class="arrow">↕</span></th>
               <th data-col="vertical_drop_ft">Drop (ft) <span class="arrow">↕</span></th>
               <th data-col="avg_slope_deg">Avg Slope° <span class="arrow">↕</span></th>
@@ -437,7 +395,7 @@
         </table>
       </div>
       <div class="source-note">
-        Trail geometry from OpenStreetMap · Elevation from OpenTopoData SRTM30m · Classification methodology per NSAA guidelines
+        Trail geometry from OpenStreetMap · Elevation from OpenTopoData SRTM30m · Classification per NSAA guidelines
       </div>
     </div>
 
@@ -447,35 +405,118 @@
 <script>
   const DIFFICULTY_ORDER = ['Green', 'Blue', 'Black', 'Double Black']
   const COLOR_MAP = { Green: '#4a8c50', Blue: '#3d7ab5', Black: '#8a8a8a', 'Double Black': '#9b6ec8' }
+  const UNGROOMED_VALUES = new Set(['mogul', 'backcountry', 'freeride'])
 
   let allTrails = []
   let officialDist = {}
+  let resortZones = []
   let sortCol = 'composite_score'
   let sortAsc = false
-  const weights = { max: 50, avg: 35, vd: 15 }
+  const weights = { max: 50, avg: 35, el: 10, vd: 5 }
 
-  function badgeClass(color) {
-    return 'badge badge-' + color.replace(' ', '')
+  // ── Theme ──────────────────────────────────────────────────────────────────
+
+  function applyTheme(theme) {
+    const root = document.documentElement
+    Object.entries(theme).forEach(([k, v]) => root.style.setProperty(`--${k}`, v))
   }
 
-  // Percentile-based classification: thresholds match the official tier distribution
+  // ── Resort list ────────────────────────────────────────────────────────────
+
+  async function loadResortList() {
+    const resorts = await fetch('/api/resorts').then(r => r.json())
+    const sel = document.getElementById('resort-select')
+    resorts.forEach(r => {
+      const opt = document.createElement('option')
+      opt.value = r.id
+      opt.textContent = r.name
+      sel.appendChild(opt)
+    })
+    sel.addEventListener('change', () => loadResort(sel.value))
+    loadResort(resorts[0].id)
+  }
+
+  // ── Resort data load ───────────────────────────────────────────────────────
+
+  function loadResort(resortId) {
+    document.getElementById('resort-select').value = resortId
+    document.getElementById('app').style.display = 'none'
+    document.getElementById('loading').style.display = 'block'
+    document.getElementById('loading-msg').textContent =
+      'Loading trail data — cached resorts load instantly, new ones take a couple of minutes…'
+    document.getElementById('error-box').style.display = 'none'
+
+    fetch(`/api/trails?resort=${resortId}`)
+      .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json() })
+      .then(data => {
+        allTrails    = data.trails
+        officialDist = data.official_distribution
+        resortZones  = data.resort.zones
+
+        // Title: last word gets accent color
+        const parts = data.resort.name.split(' ')
+        const last  = parts.pop()
+        document.getElementById('resort-title').innerHTML =
+          `${parts.join(' ')} <span>${last}</span>`
+        document.title = data.resort.name + ' Trail Analyzer'
+        document.getElementById('resort-location').textContent = data.resort.location
+
+        applyTheme(data.resort.theme)
+
+        // Rebuild zone filter
+        const mSel = document.getElementById('filter-mountain')
+        mSel.innerHTML = '<option value="">All</option>'
+        resortZones.forEach(z => {
+          const opt = document.createElement('option')
+          opt.value = z; opt.textContent = z
+          mSel.appendChild(opt)
+        })
+
+        document.getElementById('dist-breakdown').innerHTML =
+          Object.entries(officialDist)
+            .sort((a, b) => DIFFICULTY_ORDER.indexOf(a[0]) - DIFFICULTY_ORDER.indexOf(b[0]))
+            .map(([k, v]) => {
+              const count = Math.round(v * allTrails.length)
+              return `<span style="color:${COLOR_MAP[k] || '#ccc'}">${k}</span>: ${Math.round(v * 100)}% (${count} trails)`
+            })
+            .join('<br>')
+
+        document.getElementById('loading').style.display = 'none'
+        document.getElementById('app').style.display = 'block'
+        renderTable()
+      })
+      .catch(err => {
+        document.getElementById('loading').style.display = 'none'
+        const el = document.getElementById('error-box')
+        el.style.display = 'block'
+        el.textContent = 'Failed to load trail data: ' + err.message
+      })
+  }
+
+  // ── Classification ─────────────────────────────────────────────────────────
+
   function computeClassifications(trails) {
     if (!trails.length) return
     const wMax = weights.max / 100
     const wAvg = weights.avg / 100
+    const wEl  = weights.el  / 100
     const wVd  = weights.vd  / 100
+    const boost = document.getElementById('ungroomed-boost').checked
 
     trails.forEach(t => {
-      t.composite_score = wMax * t.norm_max_slope
-                        + wAvg * t.norm_avg_slope
-                        + wVd  * t.norm_vertical_drop
+      let s = wMax * t.norm_max_slope
+            + wAvg * t.norm_avg_slope
+            + wEl  * t.norm_avg_elevation
+            + wVd  * t.norm_vertical_drop
+      if (boost && UNGROOMED_VALUES.has(t.grooming)) s = Math.min(1, s * 1.2)
+      t.composite_score = s
     })
 
     const sorted = [...trails].sort((a, b) => a.composite_score - b.composite_score)
     const n = sorted.length
-    const gFrac = officialDist['Green']        || 0
-    const bFrac = officialDist['Blue']         || 0
-    const kFrac = officialDist['Black']        || 0
+    const gFrac = officialDist['Green'] || 0
+    const bFrac = officialDist['Blue']  || 0
+    const kFrac = officialDist['Black'] || 0
 
     const gThresh = sorted[Math.max(0, Math.round(gFrac * n) - 1)]?.composite_score ?? 0
     const bThresh = sorted[Math.max(0, Math.round((gFrac + bFrac) * n) - 1)]?.composite_score ?? 1
@@ -494,14 +535,20 @@
     })
   }
 
+  // ── Table ──────────────────────────────────────────────────────────────────
+
+  function badgeClass(color) { return 'badge badge-' + color.replace(' ', '') }
+
   function renderTable() {
     computeClassifications(allTrails)
 
+    const fm = document.getElementById('filter-mountain').value
     const fo = document.getElementById('filter-official').value
     const fv = document.getElementById('filter-verdict').value
     const fs = document.getElementById('search').value.toLowerCase()
 
     let trails = allTrails.filter(t =>
+      (!fm || t.mountain === fm) &&
       (!fo || t.official === fo) &&
       (!fv || t.verdict === fv) &&
       (!fs || t.name.toLowerCase().includes(fs))
@@ -510,8 +557,7 @@
     trails.sort((a, b) => {
       let av = a[sortCol], bv = b[sortCol]
       if (sortCol === 'official' || sortCol === 'computed') {
-        av = DIFFICULTY_ORDER.indexOf(av)
-        bv = DIFFICULTY_ORDER.indexOf(bv)
+        av = DIFFICULTY_ORDER.indexOf(av); bv = DIFFICULTY_ORDER.indexOf(bv)
       }
       if (typeof av === 'string') { av = av.toLowerCase(); bv = bv.toLowerCase() }
       return sortAsc ? (av < bv ? -1 : av > bv ? 1 : 0)
@@ -520,7 +566,11 @@
 
     document.getElementById('tbody').innerHTML = trails.map(t => `
       <tr>
-        <td>${t.name}</td>
+        <td>
+          ${t.name}
+          ${UNGROOMED_VALUES.has(t.grooming) ? `<span class="badge-ungroomed">${t.grooming}</span>` : ''}
+        </td>
+        <td class="mountain-tag">${t.mountain}</td>
         <td><span class="${badgeClass(t.official)}">${t.official}</span></td>
         <td>${t.vertical_drop_ft.toLocaleString()}</td>
         <td>${t.avg_slope_deg.toFixed(1)}</td>
@@ -559,9 +609,10 @@
     `
   }
 
-  // Weight sliders — adjusting one redistributes the others proportionally
-  const sliders = { max: document.getElementById('w-max'), avg: document.getElementById('w-avg'), vd: document.getElementById('w-vd') }
-  const pcts    = { max: document.getElementById('pct-max'), avg: document.getElementById('pct-avg'), vd: document.getElementById('pct-vd') }
+  // ── Weight sliders ─────────────────────────────────────────────────────────
+
+  const sliders = { max: document.getElementById('w-max'), avg: document.getElementById('w-avg'), el: document.getElementById('w-el'), vd: document.getElementById('w-vd') }
+  const pcts    = { max: document.getElementById('pct-max'), avg: document.getElementById('pct-avg'), el: document.getElementById('pct-el'), vd: document.getElementById('pct-vd') }
 
   function updateWeights(changed) {
     const newVal = parseInt(sliders[changed].value)
@@ -594,6 +645,8 @@
     renderTable()
   }
 
+  // ── Event listeners ────────────────────────────────────────────────────────
+
   Object.keys(sliders).forEach(k => sliders[k].addEventListener('input', () => updateWeights(k)))
 
   document.querySelectorAll('th[data-col]').forEach(th => {
@@ -608,35 +661,15 @@
     })
   })
 
+  document.getElementById('filter-mountain').addEventListener('change', renderTable)
   document.getElementById('filter-official').addEventListener('change', renderTable)
   document.getElementById('filter-verdict').addEventListener('change', renderTable)
   document.getElementById('search').addEventListener('input', renderTable)
+  document.getElementById('ungroomed-boost').addEventListener('change', renderTable)
 
-  fetch('/api/trails')
-    .then(r => r.json())
-    .then(data => {
-      allTrails    = data.trails
-      officialDist = data.official_distribution
+  // ── Boot ───────────────────────────────────────────────────────────────────
 
-      document.getElementById('dist-breakdown').innerHTML =
-        Object.entries(officialDist)
-          .sort((a, b) => DIFFICULTY_ORDER.indexOf(a[0]) - DIFFICULTY_ORDER.indexOf(b[0]))
-          .map(([k, v]) => {
-            const count = Math.round(v * allTrails.length)
-            return `<span style="color:${COLOR_MAP[k] || '#ccc'}">${k}</span>: ${Math.round(v * 100)}% (${count} trails)`
-          })
-          .join('<br>')
-
-      document.getElementById('loading').style.display = 'none'
-      document.getElementById('app').style.display = 'block'
-      renderTable()
-    })
-    .catch(err => {
-      document.getElementById('loading').style.display = 'none'
-      const el = document.getElementById('error-box')
-      el.style.display = 'block'
-      el.textContent = 'Failed to load trail data: ' + err.message
-    })
+  loadResortList()
 </script>
 </body>
 </html>

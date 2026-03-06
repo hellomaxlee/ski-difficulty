@@ -1,10 +1,10 @@
 [project]
-name = "my-first-claude-code-project"
+name = "ski-difficulty"
 version = "0.1.0"
-description = "Add your description here"
+description = "Topographic difficulty analyzer for US ski resorts"
 requires-python = ">=3.9"
 dependencies = [
-    "fastapi>=0.128.8",
+    "fastapi[standard]>=0.128.8",
     "jinja2>=3.1.6",
     "numpy>=2.0.2",
     "requests>=2.32.5",
