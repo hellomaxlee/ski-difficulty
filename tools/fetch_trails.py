@@ -5,6 +5,7 @@ for a given ski resort using the Overpass API.
 
 import time
 import requests
+from typing import List
 
 from tools.resorts import assign_zone
 
@@ -22,7 +23,7 @@ OSM_DIFFICULTY_MAP = {
 UNGROOMED_VALUES = {"mogul", "backcountry", "freeride"}
 
 
-def fetch_trails(resort: dict) -> list[dict]:
+def fetch_trails(resort: dict) -> List[dict]:
     """
     Query Overpass API for all named, classified downhill trails within the
     resort's bounding box. Returns trail dicts with name, official difficulty,

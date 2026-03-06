@@ -258,7 +258,7 @@
 <body>
 
 <header>
-  <h1 id="resort-title">Trail <span>Analyzer</span></h1>
+  <h1 id="resort-title">Run <span>Analyzer</span></h1>
   <select id="resort-select"></select>
   <span class="resort-location" id="resort-location"></span>
 </header>
@@ -453,12 +453,9 @@
         officialDist = data.official_distribution
         resortZones  = data.resort.zones
 
-        // Title: last word gets accent color
-        const parts = data.resort.name.split(' ')
-        const last  = parts.pop()
         document.getElementById('resort-title').innerHTML =
-          `${parts.join(' ')} <span>${last}</span>`
-        document.title = data.resort.name + ' Trail Analyzer'
+          `${data.resort.name} Run <span>Analyzer</span>`
+        document.title = data.resort.name + ' Run Analyzer'
         document.getElementById('resort-location').textContent = data.resort.location
 
         applyTheme(data.resort.theme)
