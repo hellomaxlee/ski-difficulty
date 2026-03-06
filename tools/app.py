@@ -49,6 +49,13 @@ def get_trails():
     return _cached_response
 
 
+@app.post("/api/refresh")
+def refresh():
+    global _cached_response
+    _cached_response = None
+    return {"status": "cache cleared"}
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
     template_path = Path(__file__).parent / "templates" / "index.html"
