@@ -257,6 +257,136 @@ RESORTS = {
             "border": "#202836", "text": "#c4ccd8", "muted": "#506070", "accent": "#5080b0",
         },
     },
+    "palisades_tahoe": {
+        "name": "Palisades Tahoe",
+        "location": "Olympic Valley, CA",
+        "bbox": (39.13, -120.28, 39.21, -120.18),
+        "zones": [
+            {"name": "Alpine Meadows", "lat_threshold": 39.175},
+            {"name": "Palisades",      "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#081012", "surface": "#0e181e", "surface2": "#122028",
+            "border": "#1a3040", "text": "#c4d8e0", "muted": "#4a7888", "accent": "#5ac0d8",
+        },
+    },
+    "mt_bachelor": {
+        "name": "Mt. Bachelor",
+        "location": "Bend, OR",
+        "bbox": (43.96, -121.72, 44.01, -121.66),
+        "zones": [
+            {"name": "South Side", "lat_threshold": 43.985},
+            {"name": "Summit",     "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#0e0c0a", "surface": "#181410", "surface2": "#201a14",
+            "border": "#30281e", "text": "#d4ccc4", "muted": "#7a6a58", "accent": "#c08a50",
+        },
+    },
+    "winter_park": {
+        "name": "Winter Park Resort",
+        "location": "Winter Park, CO",
+        "bbox": (39.84, -105.80, 39.89, -105.75),
+        "zones": [
+            {"name": "Mary Jane",    "lat_threshold": 39.867},
+            {"name": "Winter Park",  "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#080e0a", "surface": "#0e1810", "surface2": "#142014",
+            "border": "#1e301e", "text": "#c4d4c4", "muted": "#4a704a", "accent": "#68b060",
+        },
+    },
+    "northstar": {
+        "name": "Northstar California",
+        "location": "Truckee, CA",
+        "bbox": (39.24, -120.16, 39.28, -120.09),
+        "zones": [
+            {"name": "Backside",  "lat_threshold": 39.262},
+            {"name": "Frontside", "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#12100a", "surface": "#1e1a10", "surface2": "#262014",
+            "border": "#38301c", "text": "#d8d0c0", "muted": "#887848", "accent": "#d4a830",
+        },
+    },
+    "alta": {
+        "name": "Alta Ski Area",
+        "location": "Alta, UT",
+        "bbox": (40.57, -111.64, 40.60, -111.56),
+        "zones": [
+            {"name": "Albion Basin",    "lat_threshold": 40.585},
+            {"name": "Collins / Wildcat", "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#0a0e12", "surface": "#10161e", "surface2": "#141e28",
+            "border": "#1e2e3c", "text": "#d0dce8", "muted": "#6080a0", "accent": "#90c0e8",
+        },
+    },
+    "telluride": {
+        "name": "Telluride Ski Resort",
+        "location": "Telluride, CO",
+        "bbox": (37.88, -107.87, 37.95, -107.81),
+        "zones": [
+            {"name": "Town Side",        "lat_threshold": 37.915},
+            {"name": "Mountain Village", "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#120a08", "surface": "#1e100c", "surface2": "#281614",
+            "border": "#3c201a", "text": "#d8c8c0", "muted": "#8a5848", "accent": "#c46840",
+        },
+    },
+    "deer_valley": {
+        "name": "Deer Valley Resort",
+        "location": "Park City, UT",
+        "bbox": (40.60, -111.53, 40.66, -111.46),
+        "zones": [
+            {"name": "Snow Park",    "lat_threshold": 40.635},
+            {"name": "Empire Canyon", "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#0c0c0e", "surface": "#141418", "surface2": "#1a1a20",
+            "border": "#282830", "text": "#d0d0d8", "muted": "#686878", "accent": "#a0a0c0",
+        },
+    },
+    "crested_butte": {
+        "name": "Crested Butte",
+        "location": "Crested Butte, CO",
+        "bbox": (38.87, -106.97, 38.92, -106.93),
+        "zones": [
+            {"name": "Front Side",     "lat_threshold": 38.900},
+            {"name": "North Face",     "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#100a12", "surface": "#1a1020", "surface2": "#201628",
+            "border": "#30203c", "text": "#d4c8d8", "muted": "#7a5090", "accent": "#b870d0",
+        },
+    },
+    "arapahoe_basin": {
+        "name": "Arapahoe Basin",
+        "location": "Dillon, CO",
+        "bbox": (39.61, -105.89, 39.65, -105.85),
+        "zones": [
+            {"name": "Pallavicini",     "lat_threshold": 39.630},
+            {"name": "Montezuma Bowl",  "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#0a0c10", "surface": "#101420", "surface2": "#141a28",
+            "border": "#1e2838", "text": "#c8d0dc", "muted": "#506880", "accent": "#6898c0",
+        },
+    },
+    "taos": {
+        "name": "Taos Ski Valley",
+        "location": "Taos Ski Valley, NM",
+        "bbox": (36.56, -105.47, 36.60, -105.43),
+        "zones": [
+            {"name": "Lower Mountain",  "lat_threshold": 36.575},
+            {"name": "Kachina Peak",    "lat_threshold": math.inf},
+        ],
+        "theme": {
+            "bg": "#120c08", "surface": "#1e1610", "surface2": "#261c14",
+            "border": "#3a2a1c", "text": "#d8ccbf", "muted": "#8a6850", "accent": "#c87840",
+        },
+    },
 }
 
 
