@@ -85,8 +85,14 @@ def fetch_elevations(points):
                 continue
             response.raise_for_status()
             break
+        else:
+            # All attempts exhausted (all were 429)
+            response.raise_for_status()
 
-        elevations.extend(r["elevation"] for r in response.json()["results"])
+        data = response.json()
+        if data.get("status") == "ERROR":
+            raise ValueError(f"OpenTopoData error: {data.get('error', 'unknown')}")
+        elevations.extend(r["elevation"] for r in data["results"])
         # Always sleep after every batch to maintain 1 req/sec across all trails
         time.sleep(1.1)
 
@@ -106,7 +112,7 @@ def add_elevations_to_trails(trails):
         try:
             elevations = fetch_elevations(points)
         except Exception as e:
-            print(f"    Failed: {e} — skipping")
+            print(f"    Failed ({type(e).__name__}): {e} — skipping")
             continue
         result.append({**trail, "points": points, "elevations": elevations})
     return result

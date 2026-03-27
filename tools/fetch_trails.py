@@ -50,8 +50,14 @@ def fetch_trails(resort: dict) -> List[dict]:
             continue
         response.raise_for_status()
         break
+    else:
+        # All attempts exhausted
+        response.raise_for_status()
 
-    elements = response.json()["elements"]
+    try:
+        elements = response.json()["elements"]
+    except (ValueError, KeyError) as e:
+        raise RuntimeError(f"Unexpected Overpass response: {e}\n{response.text[:200]}")
 
     # Group ways by (name, official color) — OSM often splits one trail into
     # multiple ways at lift crossings or intersections
