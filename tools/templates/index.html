@@ -38,7 +38,38 @@
       color: var(--text);
       min-height: 100vh;
       padding: 2rem 2.5rem 4rem;
+      position: relative;
     }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image:
+        /* Diamond lattice — large */
+        linear-gradient(45deg,  var(--accent) 1px, transparent 1px),
+        linear-gradient(-45deg, var(--accent) 1px, transparent 1px),
+        /* Smaller inner diamonds */
+        linear-gradient(45deg,  var(--accent) 0.5px, transparent 0.5px),
+        linear-gradient(-45deg, var(--accent) 0.5px, transparent 0.5px);
+      background-size:
+        60px 60px,
+        60px 60px,
+        30px 30px,
+        30px 30px;
+      background-position:
+        0 0,
+        0 0,
+        15px 15px,
+        15px 15px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 0%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 0%, transparent 100%);
+    }
+
+    body > * { position: relative; z-index: 1; }
 
     /* ── Header ─────────────────────────────────────────────────────────────── */
 
