@@ -3,8 +3,6 @@ FastAPI app for the Ski Trail Analyzer.
 Run with: uv run uvicorn tools.app:app --reload --host 0.0.0.0 --port 8000
 """
 
-from collections import Counter
-
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from pathlib import Path
@@ -35,13 +33,9 @@ def analyze_resort(resort_id: str) -> dict:
     print("Scoring trails...")
     scored = score_trails(trails_with_elevations)
 
-    counts = Counter(t["official"] for t in scored)
-    total = len(scored)
-    official_distribution = {k: round(v / total, 4) for k, v in counts.items()}
-
     return {
         "trails": scored,
-        "official_distribution": official_distribution,
+        "official_distribution": resort["terrain_mix"],
         "default_weights": WEIGHTS,
         "resort": {
             "id": resort_id,
@@ -74,6 +68,8 @@ def get_trails(resort: str = Query(default="sugarbush")):
     # Disk cache hit
     cached = cache.load(resort)
     if cached is not None:
+        # Override cached distribution with resort-published terrain mix
+        cached["official_distribution"] = RESORTS[resort]["terrain_mix"]
         _mem_cache[resort] = cached
         return cached
 

@@ -10,6 +10,9 @@ provides everything needed to fetch, label, and theme a resort's trail data.
     "name": str,               # Display name, e.g. "Killington Resort"
     "location": str,           # "Town, State"
     "bbox": (lat_min, lon_min, lat_max, lon_max),  # Overpass query bounds
+    "terrain_mix": {           # Resort-published difficulty distribution (fractions, sum to 1.0)
+        "Green": float, "Blue": float, "Black": float, "Double Black": float
+    },
     "zones": [                 # Geographic mountain/peak splits, checked in order
         {"name": str, "lat_threshold": float},     # trail avg_lat < threshold → this zone
     ],
@@ -18,6 +21,12 @@ provides everything needed to fetch, label, and theme a resort's trail data.
     }
 }
 ```
+
+## Terrain Mix
+Official resort-published terrain percentages, used for classification thresholds
+instead of counting OSM tags (which are crowd-sourced and often inaccurate).
+Where resorts publish only a combined "advanced/expert" number, the split between
+Black and Double Black is estimated from resort materials and trail maps.
 
 ## Zone Assignment
 - Compute avg latitude of merged trail geometry
