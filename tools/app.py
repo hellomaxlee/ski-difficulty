@@ -33,9 +33,14 @@ def analyze_resort(resort_id: str) -> dict:
     print("Scoring trails...")
     scored = score_trails(trails_with_elevations)
 
+    from collections import Counter
+    counts = Counter(t["official"] for t in scored)
+    total = len(scored)
+    computed_dist = {k: round(v / total, 4) for k, v in counts.items()}
+
     return {
         "trails": scored,
-        "official_distribution": resort["terrain_mix"],
+        "official_distribution": resort.get("terrain_mix", computed_dist),
         "default_weights": WEIGHTS,
         "resort": {
             "id": resort_id,
@@ -68,8 +73,8 @@ def get_trails(resort: str = Query(default="sugarbush")):
     # Disk cache hit
     cached = cache.load(resort)
     if cached is not None:
-        # Override cached distribution with resort-published terrain mix
-        cached["official_distribution"] = RESORTS[resort]["terrain_mix"]
+        if "terrain_mix" in RESORTS[resort]:
+            cached["official_distribution"] = RESORTS[resort]["terrain_mix"]
         _mem_cache[resort] = cached
         return cached
 
