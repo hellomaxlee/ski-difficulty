@@ -1,0 +1,232 @@
+TRAIL DATA QUALITY AUDIT — 2026-03-27
+======================================
+
+Scope: 27 resorts, 3,204 total trails. Focused audit on 15 resorts
+with web-verified spot checks on 100+ individual trails.
+
+Sources used for verification:
+  - Alta trail map (alta.com), SlopeLab, PeakRankings
+  - Deer Valley trail map (deervalley.com)
+  - Jackson Hole (jacksonhole.com)
+  - Trailforks (trailforks.com) for individual trail profiles
+  - TripAdvisor, ski resort blogs, OpenSkiMap
+
+
+========================================================================
+1. CROSS-RESORT CONTAMINATION (CRITICAL)
+========================================================================
+
+1a. Park City / Deer Valley overlap
+    - 225 of Deer Valley's 284 trails (79%) also appear in Park City
+    - 202 share identical vertical drop metrics (confirmed duplicates)
+    - These are separate resorts with separate tickets
+    - Cause: Park City bbox east edge (-111.48) overlaps Deer Valley
+      bbox west edge (-111.53) by 0.05 degrees longitude
+    - Examples: Stein's Way, Ontario Bowl, Daly Chutes 4-8,
+      McConkey's Bowl, Non-Descript
+    - FIX: Tightened Park City bbox east edge to -111.51
+
+1b. Snowbird / Alta overlap
+    - 125 of Snowbird's 352 trails (36%) are Alta trail duplicates
+    - All share identical metrics, confirming same source data
+    - Cause: Snowbird bbox east edge (-111.60) overlaps Alta bbox
+      west edge (-111.64) — the shared ridgeline zone
+    - Examples: Alf's High Rustler, Main Chute, Baldy Chutes,
+      Greeley Bowl, "No name"
+    - FIX: Tightened Snowbird bbox east edge to -111.635
+
+1c. Palisades Tahoe / Northstar (MINOR)
+    - 4 shared trail names: Christmas Tree, Home Run, Promised Land,
+      The Face
+    - Likely legitimately different trails (common names at different
+      mountains, no metric overlap). No fix needed.
+
+
+========================================================================
+2. GHOST TRAILS / NON-TRAILS
+========================================================================
+
+2a. Lift lines recorded as ski trails
+    - Alta: "No. 9 Express" (Black, 308ft vert, 22.2 deg avg)
+    - Mt Bachelor: "Red Lift Line" (Black, 725ft), "Skyliner Liftline"
+      (Blue, 528ft), "to rainbow & cloudchaser lift" (Blue, 158ft)
+    - Park City: various lift-related entries
+    - FIX: Added name filter in fetch_trails.py to exclude entries
+      containing "lift" (case-insensitive)
+
+2b. "No name" / "No Name" entries
+    - Appear in Alta and Snowbird caches as unnamed data artifacts
+    - FIX: Added name filter to exclude "No name" / "No Name" entries
+
+2c. Zero/near-zero vertical drop entries
+    - Telluride: "Lower Plunge" at 0.0ft vert / 0.0 deg slope (ghost
+      data — a valid entry also exists at 728ft)
+    - Park City: "Super Fury" at 3.3ft vert (valid entry at 735ft)
+    - Palisades Tahoe: "Charity" at 9.8ft vert (valid entry at 476ft)
+    - These are malformed OSM segments that survived stitching
+    - FIX: Added post-fetch filter to drop trails with < 20ft vertical
+
+
+========================================================================
+3. TRAVERSES / ROADS TAGGED AS TRAILS
+========================================================================
+
+These are not errors per se — OSM tags them as piste:type=downhill
+and resorts do list them on trail maps. However, they inflate trail
+counts and skew difficulty distributions with very low slope angles.
+
+Examples across resorts:
+  - Alta: Shoulder Traverse (9.3 deg), High Traverse (9.2 deg),
+    Saddle Traverse (7.0 deg)
+  - Jackson Hole: 8 entries named "*Traverse" (as low as 88ft vert)
+  - Arapahoe Basin: Mountain Goat Traverse (10.6 deg), East Wall
+    Traverse (7.7 deg), Lightning Traverse (7.3 deg)
+  - Crested Butte: Spellbound Traverse (5.8 deg), Teo 2 Traverse
+    (7.5 deg), Many Names Traverse (10.5 deg)
+  - Vail: Sleepytime Road, Post Road, Windows Road (6.5 deg)
+  - Palisades Tahoe: Snow King Road, Summer Road, Return Road,
+    Winter Road, Barn Road, Upper Loop Road
+
+NOT FIXED: These are legitimate resort-listed routes. Filtering them
+would require subjective judgment about what counts as a "real" run.
+They do show up as overestimated in the computed classification,
+which is correct behavior.
+
+
+========================================================================
+4. DUPLICATE TRAIL NAMES WITHIN RESORTS
+========================================================================
+
+4a. Mt Bachelor (11 duplicates)
+    - Many trails appear twice with different difficulty ratings
+    - Example: Osprey Way (Black/1883ft vs Blue/446ft)
+    - Cause: Upper and lower segments tagged with the same name
+      but different difficulties in OSM — stitching can't merge
+      segments with different official ratings
+    - NOT FIXED: These represent genuinely different trail segments
+      that OSM contributors tagged separately. The scoring system
+      handles each segment independently, which is correct behavior.
+
+4b. Park City (23 duplicates — partially from DV contamination)
+    - Some are cross-resort duplicates (fixed by bbox adjustment)
+    - Others are legitimate segment splits (Tycoon, Dynamite, etc.)
+
+4c. Telluride (5 duplicates)
+    - "See Forever Road" appears 3 times with 3 different ratings
+    - "Lower Plunge" appears twice (one ghost entry — fixed by
+      vertical drop filter)
+
+4d. Snowbird (6+ duplicates)
+    - "Gad Valley Road" appears 3 times (Blue/Green/Black)
+    - Likely different segments of the same connecting road
+
+
+========================================================================
+5. WRONG DIFFICULTY RATINGS (WEB-VERIFIED)
+========================================================================
+
+5a. Telluride — "See Forever Road"
+    - One instance listed as Double Black (11.0 deg avg slope)
+    - Web verification: See Forever is a BLUE groomed cruiser
+    - Cause: OSM tagging error on one of three See Forever segments
+    - Partially addressed: the zero-vert ghost instance is removed by
+      the vertical drop filter, reducing it to 2 instances
+
+5b. Slopes too gentle for their rating
+    Double blacks under 12 deg avg (expected 25-35 deg):
+    - Winter Park: Vasquez Cirque Access (3.8 deg) — access traverse
+    - Crested Butte: Spellbound Traverse (5.8 deg), Teo 2 Traverse
+      (7.5 deg), Wind Tower (9.5 deg)
+    - Arapahoe Basin: Zuma Cornice (6.4 deg), East Wall Traverse (7.7)
+    - Taos: Chicken Blitz (5.5 deg)
+    - Telluride: The Roll (7.8 deg)
+
+    These are typically access routes, ridge traverses, or cornice
+    entries that OSM tags with the difficulty of the zone they're in
+    rather than their own gradient. NOT FIXED — this is an OSM
+    upstream data quality issue.
+
+5c. Alta — "Alf's High Rustler"
+    - Listed as Black (33 deg avg, 42 deg max)
+    - At any other resort this would be Double Black
+    - However: Alta officially does not use Double Black diamonds,
+      so "Black" is technically correct per their system
+    - NOT FIXED: Matches Alta's official rating system
+
+
+========================================================================
+6. ZONE MISASSIGNMENT
+========================================================================
+
+6a. Snowbird — all 352 trails in "Hidden Peak" zone
+    - Hidden Peak is just the summit name, not a zone
+    - Should have: Peruvian Gulch, Gad Valley, Mineral Basin
+    - Cause: Single zone with lat_threshold=inf captures everything
+    - NOT FIXED in this pass: would require multi-zone redesign for
+      Snowbird using longitude-based splits (its zones are east-west,
+      not north-south like most resorts)
+
+6b. Vail — missing Blue Sky Basin zone
+    - Only has "Front Side" and "Back Bowls"
+    - Blue Sky Basin is a distinct third zone
+    - NOT FIXED: would require adding a third zone with appropriate
+      lat threshold
+
+
+========================================================================
+7. MISSING MAJOR TRAILS
+========================================================================
+
+- Palisades Tahoe: KT-22 zone trails not labeled as such in OSM
+- Arapahoe Basin: "Pallavicini" run not present by name (zone exists)
+- These are OSM data gaps, not pipeline issues. NOT FIXED.
+
+
+========================================================================
+8. TRAIL NAME TYPOS (from OSM source data)
+========================================================================
+
+Found in Deer Valley / Park City / Snowbird caches:
+  - "White Squaw Areae" (should be "Area")
+  - "Anchor Treess" (should be "Trees")
+  - "Little Bdll" (should be "Bell")
+  - "Buckkeye" (should be "Buckeye")
+  - "Assesment" (should be "Assessment")
+
+NOT FIXED: These originate from OpenStreetMap contributor typos.
+Fixing them here would create a divergence from the source data.
+The correct fix is to edit the OSM entries upstream.
+
+
+========================================================================
+FIXES APPLIED
+========================================================================
+
+1. Tightened Park City bbox east edge: -111.48 -> -111.51
+   (eliminates Deer Valley contamination)
+
+2. Tightened Snowbird bbox east edge: -111.60 -> -111.635
+   (eliminates Alta contamination)
+
+3. Added name-based filtering in fetch_trails.py:
+   - Excludes trails with "lift" in the name (catches lift lines)
+   - Excludes "No name" / "No Name" entries
+
+4. Added vertical drop filter in score_trails.py:
+   - Drops trails with < 20ft vertical (catches ghost segments)
+
+5. Re-populated caches for: park_city, snowbird
+   (the two resorts with bbox changes)
+
+
+========================================================================
+ISSUES NOT FIXED (AND WHY)
+========================================================================
+
+- Traverses/roads as trails: legitimate resort-listed routes
+- Within-resort duplicates: represent real separate segments
+- OSM difficulty mis-tags: upstream data issue
+- OSM name typos: upstream data issue
+- Snowbird zone granularity: needs longitude-based zone logic
+- Vail Blue Sky Basin zone: needs third zone threshold
+- Missing trail names in OSM: upstream data gap

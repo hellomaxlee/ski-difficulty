@@ -72,6 +72,11 @@ def fetch_trails(resort: dict) -> List[dict]:
         if not name or not official_color or len(geometry) < 2:
             continue
 
+        # Skip lift lines and unnamed artifacts
+        name_lower = name.lower()
+        if "lift" in name_lower or name_lower in ("no name", "no_name"):
+            continue
+
         grooming = tags.get("piste:grooming", "")
         key = (name, official_color)
         groups.setdefault(key, []).append((geometry, grooming))

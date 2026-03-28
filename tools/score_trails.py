@@ -66,6 +66,9 @@ def score_trails(trails_with_elevations):
         metrics = compute_metrics(trail["points"], trail["elevations"])
         if not metrics:
             continue
+        # Drop ghost segments with negligible vertical drop
+        if metrics["vertical_drop_ft"] < 20:
+            continue
         computed.append({
             "name": trail["name"],
             "official": trail["official"],

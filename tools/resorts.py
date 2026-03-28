@@ -93,7 +93,7 @@ RESORTS = {
     "park_city": {
         "name": "Park City Mountain",
         "location": "Park City, UT",
-        "bbox": (40.59, -111.63, 40.72, -111.48),
+        "bbox": (40.59, -111.63, 40.72, -111.51),
         "terrain_mix": {"Green": 0.08, "Blue": 0.41, "Black": 0.28, "Double Black": 0.23},
         "zones": [
             {"name": "Park City Side", "lat_threshold": 40.655},
@@ -107,7 +107,7 @@ RESORTS = {
     "snowbird": {
         "name": "Snowbird",
         "location": "Alta, UT",
-        "bbox": (40.55, -111.69, 40.62, -111.60),
+        "bbox": (40.55, -111.69, 40.62, -111.635),
         "terrain_mix": {"Green": 0.08, "Blue": 0.22, "Black": 0.43, "Double Black": 0.27},
         "zones": [
             {"name": "Hidden Peak", "lat_threshold": math.inf},
