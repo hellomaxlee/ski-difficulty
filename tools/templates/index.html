@@ -386,7 +386,7 @@
     /* ── Mobile ──────────────────────────────────────────────────────────────── */
 
     @media (max-width: 768px) {
-      body { padding: 1rem 1rem 3rem; }
+      body { padding: 1rem 0.75rem 3rem; }
 
       header {
         flex-direction: column;
@@ -395,28 +395,78 @@
       }
 
       header h1 { font-size: 1.2rem; white-space: normal; }
-      #resort-select { width: 100%; }
+      #resort-select { width: 100%; font-size: 1rem; padding: 0.55rem 0.75rem; }
 
+      .about { padding: 0.85rem 1rem; }
+      .about-lead { font-size: 0.82rem; }
       .about-body { grid-template-columns: 1fr; gap: 0.6rem; }
 
       .layout { grid-template-columns: 1fr; }
       .sidebar { order: 2; }
       .main    { order: 1; }
 
-      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .card { padding: 0.85rem 0.95rem; }
 
-      td, th { padding: 0.45rem 0.55rem; font-size: 0.76rem; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+      .stat { padding: 0.45rem 0.55rem; }
+      .stat-value { font-size: 0.95rem; }
 
-      /* Hide Drop and Score columns on mobile */
+      /* Larger touch targets for sliders */
+      input[type="range"] { height: 8px; }
+      input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; }
+
+      .filter-row select,
+      .filter-row input[type="text"] {
+        font-size: 1rem;
+        padding: 0.5rem 0.65rem;
+      }
+
+      .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; }
+
+      /* Table: horizontal scroll with fade hint */
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+      }
+
+      table { font-size: 0.76rem; min-width: 580px; }
+      td, th { padding: 0.5rem 0.6rem; }
+
+      /* Hide Drop, Score bar, and Zone columns */
+      th:nth-child(2), td:nth-child(2),
       th:nth-child(4), td:nth-child(4),
       th:nth-child(7), td:nth-child(7) { display: none; }
+
+      .score-bar-bg { width: 45px; }
     }
 
     @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: 1fr 1fr; }
+      body { padding: 0.75rem 0.5rem 2.5rem; }
 
-      /* Also hide Avg Slope */
+      header h1 { font-size: 1.05rem; }
+
+      .about-lead { font-size: 0.78rem; }
+
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-label { font-size: 0.62rem; }
+      .stat-value { font-size: 0.88rem; }
+
+      table { min-width: 420px; font-size: 0.72rem; }
+      td, th { padding: 0.4rem 0.45rem; }
+
+      /* Also hide Avg Slope on very small screens */
       th:nth-child(5), td:nth-child(5) { display: none; }
+
+      .badge { font-size: 0.65rem; padding: 2px 7px; }
+      .badge-ungroomed { font-size: 0.6rem; padding: 1px 5px; }
+
+      .weight-name { font-size: 0.75rem; }
+      .weight-pct { font-size: 0.75rem; }
+      .justification { font-size: 0.68rem; }
+      .classif-note { font-size: 0.68rem; }
+
+      .source-note { font-size: 0.6rem; }
     }
   </style>
 </head>
