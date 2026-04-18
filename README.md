@@ -1,4 +1,4 @@
-# My first Claude code project: Ski Difficulty
+# My first app development project: Ski Difficulty
 ### **App is at: https://ski-difficulty-production.up.railway.app/**
 
 - Ski Difficulty rates ski runs based on max slope, average slope, elevation, and vertical drop with customizable weights.
